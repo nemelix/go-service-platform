@@ -1,0 +1,4 @@
+server
+*.tar
+.idea/
+.vscode/
