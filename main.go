@@ -5,12 +5,12 @@ import (
 	"net/http"
 )
 
-func main() {
-	http.HandleFunc("/health", func(w http.ResponseWriter, r *http.Request) {
-		fmt.Fprintln(w, "OK")
-		fmt.Fprintln(w, "Ok, you requested:", r.Method, r.URL.Path)
-	})
+func healthHandler(w http.ResponseWriter, r *http.Request) {
+	fmt.Fprintln(w, "OK")
+}
 
+func main() {
+	http.HandleFunc("/health", healthHandler)
 	fmt.Println("Listening on :8080")
 	http.ListenAndServe(":8080", nil)
 }
