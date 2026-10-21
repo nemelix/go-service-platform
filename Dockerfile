@@ -10,6 +10,7 @@ RUN CGO_ENABLED=0 go build -o server .
 
 # ==== Запуск ====
 FROM gcr.io/distroless/static-debian12:nonroot
+LABEL org.opencontainers.image.source=https://github.com/nemelix/go-service-platform
 COPY --from=builder /app/server /server
 EXPOSE 8080
 CMD ["/server"]

@@ -24,8 +24,21 @@ jobs:
   build:
     needs: test
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+    env:
+      IMAGE: ghcr.io/${{ github.repository }}
     steps:
       - uses: actions/checkout@v7
 
       - name: Build Docker image
-        run: docker build -t go-service-platform:${{ github.sha }} .
+        run: docker build -t $IMAGE:${{ github.sha }} -t $IMAGE:latest .
+
+      - name: Log in to ghcr.io
+        if: github.event_name == 'push'
+        run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
+
+      - name: Push image
+        if: github.event_name == 'push'
+        run: docker push --all-tags $IMAGE
