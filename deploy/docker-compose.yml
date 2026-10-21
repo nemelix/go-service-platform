@@ -1,3 +1,5 @@
+name: go-service-platform
+
 services:
   app:
     image: ghcr.io/nemelix/go-service-platform:${APP_TAG:-latest}
