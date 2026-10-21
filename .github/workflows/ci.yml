@@ -42,3 +42,30 @@ jobs:
       - name: Push image
         if: github.event_name == 'push'
         run: docker push --all-tags $IMAGE
+
+  deploy:
+    needs: build
+    if: github.event_name == 'push'
+    runs-on: ubuntu-latest
+    environment:
+      name: production
+      url: https://64-188-81-197.sslip.io/health
+    concurrency:
+      group: production
+      cancel-in-progress: false
+    steps:
+      - name: Set up SSH
+        env:
+          SSH_KEY: ${{ secrets.DEPLOY_SSH_KEY }}
+          KNOWN_HOSTS: ${{ secrets.DEPLOY_KNOWN_HOSTS }}
+        run: |
+          mkdir -p ~/.ssh
+          printf '%s\n' "$SSH_KEY" > ~/.ssh/deploy_key
+          chmod 600 ~/.ssh/deploy_key
+          printf '%s\n' "$KNOWN_HOSTS" > ~/.ssh/known_hosts
+
+      - name: Deploy
+        run: ssh -i ~/.ssh/deploy_key -p ${{ vars.DEPLOY_PORT }} deploy@${{ vars.DEPLOY_HOST }} "${{ github.sha }}"
+
+      - name: Smoke test
+        run: curl -fsS --retry 5 --retry-delay 3 --retry-all-errors https://64-188-81-197.sslip.io/health
