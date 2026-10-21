@@ -6,7 +6,7 @@ import (
 )
 
 func healthHandler(w http.ResponseWriter, r *http.Request) {
-	fmt.Fprintln(w, "OK")
+	fmt.Fprintln(w, "OK", r.RemoteAddr, r.Header.Get("X-Real-IP"))
 }
 
 func main() {
