@@ -17,6 +17,5 @@ echo "APP_TAG=${TAG}" > .env
 docker compose pull app
 docker compose up -d app
 docker compose exec -T nginx nginx -s reload
-docker image prune -f > /dev/null
-
+docker image prune -af --filter "label=org.opencontainers.image.source=https://github.com/nemelix/go-service-platform" > /dev/null
 echo "deployed ${TAG}"
