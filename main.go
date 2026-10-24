@@ -2,15 +2,16 @@ package main
 
 import (
 	"fmt"
+	"log"
 	"net/http"
 )
 
 func healthHandler(w http.ResponseWriter, r *http.Request) {
-	fmt.Fprintln(w, "OK")
+	_, _ = fmt.Fprintln(w, "OK")
 }
 
 func main() {
 	http.HandleFunc("/health", healthHandler)
 	fmt.Println("Listening on :8080")
-	http.ListenAndServe(":8080", nil)
+	log.Fatalln("error:", http.ListenAndServe(":8080", nil))
 }
