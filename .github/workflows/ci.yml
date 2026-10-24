@@ -9,20 +9,35 @@ jobs:
   test:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v7
+      - name: Checkout code
+        uses: actions/checkout@v7
 
-      - uses: actions/setup-go@v7
+      - name: Setup Go
+        uses: actions/setup-go@v7
         with:
           go-version-file: go.mod
-
-      - name: Vet
-        run: go vet ./...
 
       - name: Test
         run: go test -v ./...
 
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v7
+
+      - name: Setup Go
+        uses: actions/setup-go@v7
+        with:
+          go-version-file: go.mod
+
+      - name: Run golangci-lint
+        uses: golangci/golangci-lint-action@v9
+        with:
+          version: v2.15
+
   build:
-    needs: test
+    needs: [lint, test]
     runs-on: ubuntu-latest
     permissions:
       contents: read
