@@ -1,5 +1,5 @@
 # ==== Сборка ====
-FROM golang:1.27.2 AS builder
+FROM golang:1.27.3 AS builder
 WORKDIR /app
 
 COPY go.mod ./
