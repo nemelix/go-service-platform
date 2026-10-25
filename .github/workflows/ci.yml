@@ -20,7 +20,7 @@ jobs:
       - name: Test
         run: go test -v ./...
 
-  lint:
+  golangci-lint:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
@@ -57,7 +57,7 @@ jobs:
         run: find . -name "*.sh" -exec shellcheck {} +
 
   build:
-    needs: [lint, hadolint, shellcheck, test]
+    needs: [golangci-lint, hadolint, shellcheck, test]
     runs-on: ubuntu-latest
     permissions:
       contents: read
