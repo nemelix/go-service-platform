@@ -102,7 +102,9 @@ Details and more stories: [docs/problems.md](docs/problems.md).
 ├── main.go                      # the app
 ├── main_test.go                 # tests
 ├── Dockerfile                   # multi-stage build
-├── docs/problems.md             # problems I ran into, in detail
+├── docs/
+│   ├── problems.md              # problems I ran into, in detail
+│   └── problems.ru.md           # the same in Russian
 ├── .github/
 │   ├── workflows/
 │   │   ├── ci.yml               # CI/CD: checks → build + Trivy → deploy

@@ -102,7 +102,9 @@ flowchart LR
 ├── main.go                      # приложение
 ├── main_test.go                 # тесты
 ├── Dockerfile                   # multi-stage сборка
-├── docs/problems.ru.md          # с чем столкнулся, подробно
+├── docs/
+│   ├── problems.md              # с чем столкнулся, на английском
+│   └── problems.ru.md           # с чем столкнулся, подробно
 ├── .github/
 │   ├── workflows/
 │   │   ├── ci.yml               # CI/CD: проверки → build + Trivy → deploy
