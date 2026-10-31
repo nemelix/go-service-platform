@@ -4,6 +4,8 @@ services:
   app:
     image: ghcr.io/nemelix/go-service-platform:${APP_TAG:-latest}
     restart: unless-stopped
+    environment:
+      APP_ADDR: ${APP_ADDR:-8080}
 
   nginx:
     image: nginx:1.30-alpine
