@@ -2,7 +2,7 @@ package main
 
 import (
 	"fmt"
-	"log"
+	"log/slog"
 	"net/http"
 	"os"
 )
@@ -19,13 +19,16 @@ func getenv(key, fallback string) string {
 }
 
 func main() {
+	slog.SetDefault(slog.New(slog.NewJSONHandler(os.Stdout, nil)))
+
 	addr := getenv("APP_ADDR", ":8080")
 
 	http.HandleFunc("/health", healthHandler)
 
-	log.Printf("Listening on %s", addr)
+	slog.Info("listening", "addr", addr)
 
 	if err := http.ListenAndServe(addr, nil); err != nil {
-		log.Fatalf("Server error: %s", err)
+		slog.Error("server failed", "err", err)
+		os.Exit(1)
 	}
 }
