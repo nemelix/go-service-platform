@@ -3,21 +3,34 @@ package main
 import (
 	"net/http"
 	"net/http/httptest"
-	"strings"
 	"testing"
 )
 
-func TestHealthHandler(t *testing.T) {
-	req := httptest.NewRequest(http.MethodGet, "/health", nil)
+func doRequest(t *testing.T, method, path string) *httptest.ResponseRecorder {
+	t.Helper()
 	rec := httptest.NewRecorder()
+	newMux().ServeHTTP(rec, httptest.NewRequest(method, path, nil))
+	return rec
+}
 
-	healthHandler(rec, req)
-
+func TestHealthz(t *testing.T) {
+	rec := doRequest(t, http.MethodGet, "/healthz")
 	if rec.Code != http.StatusOK {
-		t.Errorf("healthHandler returned wrong status code: got %d want %d", rec.Code, http.StatusOK)
+		t.Errorf("status = %d, want %d", rec.Code, http.StatusOK)
 	}
-	if !strings.Contains(rec.Body.String(), "OK") {
-		t.Errorf("body = %q, want it to contain OK", rec.Body.String())
+}
+
+func TestReadyz(t *testing.T) {
+	rec := doRequest(t, http.MethodGet, "/readyz")
+	if rec.Code != http.StatusOK {
+		t.Errorf("status = %d, want %d", rec.Code, http.StatusOK)
+	}
+}
+
+func TestMethodNotAllowed(t *testing.T) {
+	rec := doRequest(t, http.MethodPost, "/healthz")
+	if rec.Code != http.StatusMethodNotAllowed {
+		t.Errorf("status = %d, want %d", rec.Code, http.StatusMethodNotAllowed)
 	}
 }
 

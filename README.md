@@ -6,7 +6,7 @@
 
 A small Go service I use to practice DevOps: containers, CI/CD, deploying to my own server and HTTPS.
 
-Live: https://64-188-81-197.sslip.io/health
+Live: https://64-188-81-197.sslip.io/healthz
 
 ## Architecture
 
@@ -68,7 +68,7 @@ Checks on every PR:
 
 - Every image is tagged with the commit sha - the tag tells exactly what code is running, and I can roll back to any version.
 - Deploy: CI connects over SSH and passes the sha, a script on the server saves the tag to `.env` and updates only the app container.
-- After the deploy CI checks `/health` over HTTPS.
+- After the deploy CI checks `/healthz` over HTTPS.
 - `main` is protected: changes get in only through a PR where every check passed. Each check is added to the ruleset on its own.
 
 ## Security
@@ -121,7 +121,7 @@ Details and more stories: [docs/problems.md](docs/problems.md).
 ```bash
 # without Docker
 go run .
-curl localhost:8080/health
+curl localhost:8080/healthz
 
 # in Docker
 docker build -t go-service-platform:dev .
