@@ -42,6 +42,21 @@ func main() {
 	ctx, stop := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM)
 	defer stop()
 
+	dbURL := os.Getenv("DATABASE_URL")
+	if dbURL == "" {
+		slog.Error("DATABASE_URL is not set")
+		os.Exit(1)
+	}
+
+	pool, err := openDB(ctx, dbURL)
+	if err != nil {
+		slog.Error("database unavailable", "err", err)
+		os.Exit(1)
+	}
+
+	defer pool.Close()
+	slog.Info("database connected")
+
 	srv := &http.Server{
 		Addr:              addr,
 		Handler:           logRequests(newMux()),
