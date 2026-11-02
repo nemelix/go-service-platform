@@ -105,7 +105,7 @@ jobs:
     runs-on: ubuntu-latest
     environment:
       name: production
-      url: https://64-188-81-197.sslip.io/health
+      url: https://64-188-81-197.sslip.io/healthz
     concurrency:
       group: production
       cancel-in-progress: false
@@ -124,4 +124,4 @@ jobs:
         run: ssh -i ~/.ssh/deploy_key -p ${{ vars.DEPLOY_PORT }} deploy@${{ vars.DEPLOY_HOST }} "${{ github.sha }}"
 
       - name: Smoke test
-        run: curl -fsS --retry 5 --retry-delay 3 --retry-all-errors https://64-188-81-197.sslip.io/health
+        run: curl -fsS --retry 5 --retry-delay 3 --retry-all-errors https://64-188-81-197.sslip.io/healthz

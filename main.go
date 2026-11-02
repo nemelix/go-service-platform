@@ -12,8 +12,19 @@ import (
 	"time"
 )
 
-func healthHandler(w http.ResponseWriter, r *http.Request) {
+func healthzHandler(w http.ResponseWriter, r *http.Request) {
 	_, _ = fmt.Fprintln(w, "OK")
+}
+
+func readyzHandler(w http.ResponseWriter, r *http.Request) {
+	_, _ = fmt.Fprintln(w, "ready")
+}
+
+func newMux() http.Handler {
+	mux := http.NewServeMux()
+	mux.HandleFunc("GET /healthz", healthzHandler)
+	mux.HandleFunc("GET /readyz", readyzHandler)
+	return mux
 }
 
 func getenv(key, fallback string) string {
@@ -31,12 +42,9 @@ func main() {
 	ctx, stop := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM)
 	defer stop()
 
-	mux := http.NewServeMux()
-	mux.HandleFunc("/health", healthHandler)
-
 	srv := &http.Server{
 		Addr:              addr,
-		Handler:           logRequests(mux),
+		Handler:           logRequests(newMux()),
 		ReadHeaderTimeout: 5 * time.Second,
 	}
 
