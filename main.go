@@ -23,11 +23,12 @@ func main() {
 
 	addr := getenv("APP_ADDR", ":8080")
 
-	http.HandleFunc("/health", healthHandler)
+	mux := http.NewServeMux()
+	mux.HandleFunc("/health", healthHandler)
 
 	slog.Info("listening", "addr", addr)
 
-	if err := http.ListenAndServe(addr, nil); err != nil {
+	if err := http.ListenAndServe(addr, logRequests(mux)); err != nil {
 		slog.Error("server failed", "err", err)
 		os.Exit(1)
 	}
