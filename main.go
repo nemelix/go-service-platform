@@ -3,7 +3,6 @@ package main
 import (
 	"context"
 	"errors"
-	"fmt"
 	"log/slog"
 	"net/http"
 	"os"
@@ -11,21 +10,6 @@ import (
 	"syscall"
 	"time"
 )
-
-func healthzHandler(w http.ResponseWriter, r *http.Request) {
-	_, _ = fmt.Fprintln(w, "OK")
-}
-
-func readyzHandler(w http.ResponseWriter, r *http.Request) {
-	_, _ = fmt.Fprintln(w, "ready")
-}
-
-func newMux() http.Handler {
-	mux := http.NewServeMux()
-	mux.HandleFunc("GET /healthz", healthzHandler)
-	mux.HandleFunc("GET /readyz", readyzHandler)
-	return mux
-}
 
 func getenv(key, fallback string) string {
 	if v, ok := os.LookupEnv(key); ok {
@@ -63,9 +47,11 @@ func main() {
 		os.Exit(1)
 	}
 
+	app := newServer(store)
+
 	srv := &http.Server{
 		Addr:              addr,
-		Handler:           logRequests(newMux()),
+		Handler:           app.routes(),
 		ReadHeaderTimeout: 5 * time.Second,
 	}
 

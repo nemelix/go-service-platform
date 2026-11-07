@@ -42,3 +42,7 @@ func (s *pgStore) AddVisit(ctx context.Context) (int64, error) {
 		RETURNING count`).Scan(&n)
 	return n, err
 }
+
+func (s *pgStore) Ping(ctx context.Context) error {
+	return s.pool.Ping(ctx)
+}
