@@ -3,7 +3,6 @@ package main
 import (
 	"context"
 	"errors"
-	"fmt"
 	"log/slog"
 	"net/http"
 	"os"
@@ -11,21 +10,6 @@ import (
 	"syscall"
 	"time"
 )
-
-func healthzHandler(w http.ResponseWriter, r *http.Request) {
-	_, _ = fmt.Fprintln(w, "OK")
-}
-
-func readyzHandler(w http.ResponseWriter, r *http.Request) {
-	_, _ = fmt.Fprintln(w, "ready")
-}
-
-func newMux() http.Handler {
-	mux := http.NewServeMux()
-	mux.HandleFunc("GET /healthz", healthzHandler)
-	mux.HandleFunc("GET /readyz", readyzHandler)
-	return mux
-}
 
 func getenv(key, fallback string) string {
 	if v, ok := os.LookupEnv(key); ok {
@@ -42,9 +26,32 @@ func main() {
 	ctx, stop := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM)
 	defer stop()
 
+	dbURL := os.Getenv("DATABASE_URL")
+	if dbURL == "" {
+		slog.Error("DATABASE_URL is not set")
+		os.Exit(1)
+	}
+
+	pool, err := openDB(ctx, dbURL)
+	if err != nil {
+		slog.Error("database unavailable", "err", err)
+		os.Exit(1)
+	}
+
+	defer pool.Close()
+	slog.Info("database connected")
+
+	store := &pgStore{pool: pool}
+	if err := store.EnsureSchema(ctx); err != nil {
+		slog.Error("ensure schema", "err", err)
+		os.Exit(1)
+	}
+
+	app := newServer(store)
+
 	srv := &http.Server{
 		Addr:              addr,
-		Handler:           logRequests(newMux()),
+		Handler:           app.routes(),
 		ReadHeaderTimeout: 5 * time.Second,
 	}
 
