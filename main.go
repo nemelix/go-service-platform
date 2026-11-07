@@ -41,11 +41,12 @@ func main() {
 	defer pool.Close()
 	slog.Info("database connected")
 
-	store := &pgStore{pool: pool}
-	if err := store.EnsureSchema(ctx); err != nil {
-		slog.Error("ensure schema", "err", err)
+	if err := migrate(dbURL); err != nil {
+		slog.Error("migrate", "err", err)
 		os.Exit(1)
 	}
+
+	store := &pgStore{pool: pool}
 
 	app := newServer(store)
 
