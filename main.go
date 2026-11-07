@@ -57,6 +57,12 @@ func main() {
 	defer pool.Close()
 	slog.Info("database connected")
 
+	store := &pgStore{pool: pool}
+	if err := store.EnsureSchema(ctx); err != nil {
+		slog.Error("ensure schema", "err", err)
+		os.Exit(1)
+	}
+
 	srv := &http.Server{
 		Addr:              addr,
 		Handler:           logRequests(newMux()),
