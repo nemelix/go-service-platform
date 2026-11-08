@@ -1,3 +1,5 @@
+name: go-service-platform-dev
+
 services:
   db:
     image: postgres:18-alpine
