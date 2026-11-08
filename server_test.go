@@ -28,7 +28,6 @@ func (f *fakeStore) AddVisit(context.Context) (int64, error) {
 	return f.count, nil
 }
 
-// do прогоняет запрос через настоящие маршруты сервера и возвращает записанный ответ.
 func do(t *testing.T, store visitStore, method, path string) *httptest.ResponseRecorder {
 	t.Helper()
 	rec := httptest.NewRecorder()
@@ -113,5 +112,19 @@ func TestMethodNotAllowed(t *testing.T) {
 
 	if rec.Code != http.StatusMethodNotAllowed {
 		t.Errorf("status = %d, want %d", rec.Code, http.StatusMethodNotAllowed)
+	}
+}
+
+func TestMetrics(t *testing.T) {
+	store := &fakeStore{}
+	do(t, store, http.MethodGet, "/healthz")
+
+	rec := do(t, store, http.MethodGet, "/metrics")
+
+	if rec.Code != http.StatusOK {
+		t.Fatalf("status = %d, want %d", rec.Code, http.StatusOK)
+	}
+	if !strings.Contains(rec.Body.String(), "http_requests_total") {
+		t.Errorf("metrics output has no http_requests_total")
 	}
 }

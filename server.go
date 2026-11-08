@@ -6,9 +6,10 @@ import (
 	"log/slog"
 	"net/http"
 	"time"
+
+	"github.com/prometheus/client_golang/prometheus/promhttp"
 )
 
-// visitStore описывает, что обработчикам нужно от хранилища.
 type visitStore interface {
 	Ping(ctx context.Context) error
 	Visits(ctx context.Context) (int64, error)
@@ -29,7 +30,8 @@ func (s *server) routes() http.Handler {
 	mux.HandleFunc("GET /readyz", s.handleReadyz)
 	mux.HandleFunc("GET /api/visits", s.handleGetVisits)
 	mux.HandleFunc("POST /api/visits", s.handleAddVisit)
-	return logRequests(mux)
+	mux.Handle("GET /metrics", promhttp.Handler())
+	return instrument(logRequests(mux))
 }
 
 func (s *server) handleHealthz(w http.ResponseWriter, _ *http.Request) {
@@ -67,6 +69,7 @@ func (s *server) handleAddVisit(w http.ResponseWriter, r *http.Request) {
 		s.internalError(w, r, "add visit", err)
 		return
 	}
+	visitsTotal.Inc()
 	writeJSON(w, http.StatusOK, visitsResponse{Visits: n})
 }
 
