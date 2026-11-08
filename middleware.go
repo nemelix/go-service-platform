@@ -23,6 +23,10 @@ func logRequests(next http.Handler) http.Handler {
 
 		next.ServeHTTP(rec, r)
 
+		if r.URL.Path == "/metrics" || r.URL.Path == "/healthz" || r.URL.Path == "/readyz" {
+			return
+		}
+
 		slog.Info("request",
 			"method", r.Method,
 			"path", r.URL.Path,
