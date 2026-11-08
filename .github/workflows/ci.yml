@@ -8,6 +8,19 @@ on:
 jobs:
   test:
     runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:18-alpine
+        env:
+          POSTGRES_USER: app
+          POSTGRES_PASSWORD: test
+          POSTGRES_DB: app
+        ports: [ "5432:5432" ]
+        options: >-
+          --health-cmd "pg_isready -U app"
+          --health-interval 5s --health-timeout 3s --health-retries 10
+    env:
+      DATABASE_URL: postgres://app:test@localhost:5432/app?sslmode=disable
     steps:
       - name: Checkout code
         uses: actions/checkout@v7
