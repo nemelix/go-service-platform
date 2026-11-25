@@ -21,5 +21,10 @@ services:
       - /:/host:ro,rslave
     restart: unless-stopped
 
+  postgres-exporter:
+    image: quay.io/prometheuscommunity/postgres-exporter:v0.21.1
+    env_file: postgres-exporter.env
+    restart: unless-stopped
+
 volumes:
   prometheus-data:
