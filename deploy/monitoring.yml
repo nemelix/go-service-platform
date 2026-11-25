@@ -12,5 +12,19 @@ services:
       - prometheus-data:/prometheus
     restart: unless-stopped
 
+  node-exporter:
+    image: prom/node-exporter:v1.13.1
+    command:
+      - --path.rootfs=/host
+    pid: host
+    volumes:
+      - /:/host:ro,rslave
+    restart: unless-stopped
+
+  postgres-exporter:
+    image: quay.io/prometheuscommunity/postgres-exporter:v0.21.1
+    env_file: postgres-exporter.env
+    restart: unless-stopped
+
 volumes:
   prometheus-data:
