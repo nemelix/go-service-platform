@@ -1,5 +1,8 @@
 name: go-service-platform
 
+include:
+  - monitoring.yml  # docker compose v2.20.0+ required
+
 services:
   app:
     image: ghcr.io/nemelix/go-service-platform:${APP_TAG:-latest}

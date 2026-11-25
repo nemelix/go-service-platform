@@ -54,7 +54,7 @@ func TestReadyz(t *testing.T) {
 			t.Errorf("status = %d, want %d", rec.Code, http.StatusOK)
 		}
 	})
-
+	
 	t.Run("db down -> 503", func(t *testing.T) {
 		store := &fakeStore{pingErr: errors.New("connection refused")}
 		rec := do(t, store, http.MethodGet, "/readyz")
